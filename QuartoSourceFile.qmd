@@ -1,0 +1,10 @@
+---
+title: "First test"
+author: "Alex Pyatigorsky"
+format: html
+editor: visual
+---
+
+## Data
+
+This is for my Plastic Waste Data
