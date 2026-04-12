@@ -1,0 +1,123 @@
+---
+title: "Project 1 C2"
+author: "Alex Pyatigorsky"
+format: html
+editor: visual
+---
+
+### Break Free from Plastic: Plastic Pollution Data
+
+#### Background
+
+Break free from plastic is a non profit group which tracks the plastic waste produced by companies in their community. They call them "brand audits" and they collect data annually and started in to do so in 2019. They aim to hold brands accountable for the waste they put into the environment.
+
+The data contains information such as the country where the cleanup occured, the company responsible for the waste, the number of volunteers who contributed, and the type of recyclable material in the waste.
+
+#### Data
+
+```{r, output=FALSE,echo=FALSE}
+library(tidyverse)
+library(readr)
+plastics <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2021/2021-01-26/plastics.csv')
+
+names(plastics)
+```
+
+This is what the first few rows of the data set looks like:
+
+```{r,echo=FALSE}
+head(plastics)
+```
+
+#### **Custom data summary function with iteration:**
+
+```{r}
+summ_stats <- function(x){
+  if (is.numeric(x)){
+    tibble(
+    min = min(x, na.rm = TRUE),
+    mean = mean(x, na.rm = TRUE),
+    median = median(x, na.rm = TRUE),
+    sd = sd(x, na.rm = TRUE),
+    iqr = IQR(x, na.rm = TRUE),
+    max = max(x, na.rm = TRUE)
+  )
+  }
+}
+
+summ_df <- function(x){
+  quant_x <- x |> 
+    select(where(is.numeric)) |> 
+    map(summ_stats) |> 
+    bind_rows(.id = "variable")
+    quant_x |> 
+    pivot_longer(cols = c("min", "mean", "median", "sd", "iqr", "max"), 
+              names_to = "metric", values_to = "value") |> 
+    pivot_wider(names_from = "variable", values_from = "value")
+}
+```
+
+{{< pagebreak >}}
+
+### Summary: Volunteers for Cleanups
+
+```{r}
+plastics |> select(volunteers) |> summ_df()
+```
+
+### Summary: Number of Cleanup Events
+
+```{r}
+plastics |> select(num_events) |> summ_df()
+```
+
+{{< pagebreak >}}
+
+#### Custom data proportion plastic types summary function:
+
+**New column: proportion of plastic types**
+
+```{r}
+prop_summary <- function(df) {
+    df |>
+    pivot_longer(cols = c(hdpe, ldpe, o, pet, pp, ps, pvc),
+                names_to = "plastic_type",
+                values_to = "count") |>
+    mutate(prop = count / grand_total) |>
+    group_by(plastic_type) |>
+    summarize(mean_prop = mean(prop, na.rm = TRUE),
+          total_count = sum(count, na.rm = TRUE))
+}
+```
+
+### Summary: Proportion of Plastic Types
+
+```{r}
+prop_summary(plastics)
+```
+
+{{< pagebreak >}}
+
+#### Custom total plastic by plastic type by country summary function:
+**New columns: Plastic Type, Total**
+
+```{r}
+plastic_types <- c("hdpe", "ldpe", "o", "pet", "pp", "ps", "pvc")
+
+tot_plastic_types = function(type) {
+  plastics |>
+    group_by(country) |>
+    summarize(plastic_type = type,
+  total = sum(get(type), na.rm = TRUE))
+}
+```
+
+### Summary: Total Plastic by Plastic Type by Country
+
+
+
+```{r}
+
+map(plastic_types, tot_plastic_types) |>
+bind_rows()
+```
