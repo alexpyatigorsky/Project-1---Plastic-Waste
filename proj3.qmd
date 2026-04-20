@@ -1,0 +1,151 @@
+---
+title: "Project Checkpoint 3"
+author: "Alex Pyatigorsky"
+format: html
+editor: visual
+---
+
+## New Datasets
+
+Our first new dataset comes from the API Ninjas GDP API, which provides the GDP of every country from 1980 to 2029 (projected values for future years). It includes GDP growth as a percentage change from the previous year, total nominal GDP in USD, GDP per capita in current USD, total GDP adjusted for purchasing power parity (PPP), PPP-adjusted GDP per person, and each country's share of the global economy. GDP is relevant to our research because economic development may correlate with plastic waste generation — wealthier countries tend to consume more packaged goods, which could influence the volume of plastic produced and discarded.
+
+Our second new dataset comes from a CSV downloaded from the U.S. Census Bureau's International Data Base, which provides total population and land area (in square kilometers) for each country. These variables allow us to normalize plastic waste counts by population or area, giving us a more accurate picture of plastic waste intensity across countries of different sizes. We hypothesize that population and area both correlate with total plastic waste.
+
+```{r}
+#| message: false
+#| warning: false
+library(glue)
+library(jsonlite)
+library(tidyverse)
+library(httr)
+library(tidyjson)
+library(purrr)
+
+my_key <- "6LicLDrjHjuRlKqbpSQLlTPsyxvQlW9n1ITPcsDr"
+
+get_gdp <- function(country, key = my_key) {
+  country <- URLencode(country)
+  url <- glue("https://api.api-ninjas.com/v1/gdp?country={country};X-Api-Key={key}")
+  my_data <- safely(fromJSON)(url)
+  if (is.null(my_data$result)) {
+    return(NA)
+  } else {
+    return(my_data$result)
+  }
+}
+
+plastics <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2021/2021-01-26/plastics.csv')
+
+my_countries <- plastics |> distinct(country) |> pull(country)
+
+gdp_list <- my_countries |> map(get_gdp)
+
+gdp_df <- gdp_list |> set_names(my_countries) |> bind_rows(.id = "Country")
+
+# Align column name for merging
+names(gdp_df)[names(gdp_df) == "Country"] <- "country_merge"
+gdp_df <- gdp_df |> select(-country)
+names(gdp_df)[names(gdp_df) == "country_merge"] <- "country"
+
+head(gdp_df)
+names(plastics)
+```
+
+```{r}
+#| message: false
+#| warning: false
+
+#### Country Population and Square Kilometers Data for years 2019-2020:
+
+census_data <- read.csv("~/Downloads/IDB_04-15-2026.csv")
+head(census_data)
+tail(census_data)
+
+#U.S. Census Bureau. (2026). *International Data Base: Custom table — population and area* \[Data tool\]. U.S. Department of Commerce. <https://www.census.gov/data-tools/demo/idb/>
+
+#### Cleaning Data
+
+# remove repetitive rows containing year
+census_data <- census_data[!is.na(census_data$Year),]
+
+# convert year to numeric
+census_data$Year <- as.numeric(census_data$Year)
+
+# convert column names to lower case
+names(census_data) <- str_to_lower(names(census_data))
+
+# rename 'name' column to 'country' 
+names(census_data)[names(census_data) == 'name'] <- 'country'
+
+# Convert population and area to numeric (they read in as strings with commas)
+census_data$population <- as.numeric(gsub(",", "", census_data$population))
+census_data$area.in.square.kilometers <- as.numeric(gsub(",", "", census_data$area.in.square.kilometers))
+
+# correct census_data and plastics names to match
+census_data <- census_data |>
+  mutate(country = case_when(
+    country == 'Côte d’Ivoire' ~ 'Cote D_ivoire',
+    country == 'Korea, South' ~ 'Korea',
+    country == 'Taiwan' ~ 'Taiwan_ Republic of China (ROC)',
+    country == 'United States' ~ 'United States of America',
+    TRUE ~ country
+  ))
+
+plastics <- plastics |>
+  mutate(country = case_when(
+    country == 'ECUADOR' ~ 'Ecuador',
+    country == 'NIGERIA' ~ 'Nigeria',
+    country == 'United Kingdom of Great Britain & Northern Ireland' ~ 'United Kingdom',
+    TRUE ~ country
+  ))
+
+#### Merging Data
+
+# Merge census data
+plastics <- merge(plastics, census_data, all.x = TRUE, by = c('country','year'))
+
+# Merge GDP data
+plastics <- merge(plastics, gdp_df, all.x = TRUE, by = c('country', 'year'))
+
+names(plastics)
+```
+
+```{r}
+#| message: false
+#| warning: false
+
+plastics |>
+  group_by(country) |>
+  summarise(
+    total_plastic = sum(grand_total, na.rm = TRUE),
+    avg_gdp = mean(gdp_per_capita_nominal, na.rm = TRUE)
+  ) |>
+  ggplot(aes(x = country, y = total_plastic, fill = avg_gdp)) +
+  geom_col() +
+  labs(
+    title = "Plastic Waste by Country and GDP Per Capita",
+    x = "Country",
+    y = "Total Plastic Waste",
+    fill = "GDP Per Capita (USD)"
+  ) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+```{r}
+#| message: false
+#| warning: false
+
+plastics |>
+  group_by(country) |>
+  summarise(
+    total_plastic = sum(grand_total, na.rm = TRUE),
+    avg_population = mean(population, na.rm = TRUE)
+  ) |>
+  ggplot(aes(x = avg_population, y = total_plastic)) +
+  geom_point(color = "dodgerblue", size = 3) +
+  labs(
+    title = "Plastic Waste vs. Population by Country",
+    x = "Population",
+    y = "Total Plastic Waste"
+  )
+```
