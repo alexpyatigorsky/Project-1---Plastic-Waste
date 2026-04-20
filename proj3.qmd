@@ -21,7 +21,6 @@ library(httr)
 library(tidyjson)
 library(purrr)
 
-my_key <- "6LicLDrjHjuRlKqbpSQLlTPsyxvQlW9n1ITPcsDr"
 
 get_gdp <- function(country, key = my_key) {
   country <- URLencode(country)
@@ -113,6 +112,8 @@ names(plastics)
 ```{r}
 #| message: false
 #| warning: false
+#| fig-width: 10
+#| fig-height: 12
 
 plastics |>
   group_by(country) |>
@@ -120,15 +121,15 @@ plastics |>
     total_plastic = sum(grand_total, na.rm = TRUE),
     avg_gdp = mean(gdp_per_capita_nominal, na.rm = TRUE)
   ) |>
-  ggplot(aes(x = country, y = total_plastic, fill = avg_gdp)) +
+  ggplot(aes(x = total_plastic, y = country, fill = avg_gdp)) +
   geom_col() +
+  scale_x_continuous(labels = scales::comma) +
   labs(
     title = "Plastic Waste by Country and GDP Per Capita",
-    x = "Country",
-    y = "Total Plastic Waste",
+    x = "Total Plastic Waste",
+    y = "Country",
     fill = "GDP Per Capita (USD)"
-  ) +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  )
 ```
 
 ```{r}
@@ -142,7 +143,8 @@ plastics |>
     avg_population = mean(population, na.rm = TRUE)
   ) |>
   ggplot(aes(x = avg_population, y = total_plastic)) +
-  geom_point(color = "dodgerblue", size = 3) +
+  scale_x_continuous(labels = scales::comma, breaks = seq(0,1500000000, by=250000000)) +
+  geom_point(color = "dodgerblue", size = 1) +
   labs(
     title = "Plastic Waste vs. Population by Country",
     x = "Population",
