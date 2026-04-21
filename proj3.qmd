@@ -21,26 +21,28 @@ library(httr)
 library(tidyjson)
 library(purrr)
 
+# get_gdp <- function(country, key = my_key) {
+#   country <- URLencode(country)
+#   url <- glue("https://api.api-ninjas.com/v1/gdp?country={country};X-Api-Key={key}")
+#   my_data <- safely(fromJSON)(url)
+#   if (is.null(my_data$result)) {
+#     return(NA)
+#   } else {
+#     return(my_data$result)
+#   }
+# }
+# 
+# plastics <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2021/2021-01-26/plastics.csv')
+# 
+# my_countries <- plastics |> distinct(country) |> pull(country)
+# 
+# gdp_list <- my_countries |> map(get_gdp)
+# 
+# gdp_df <- gdp_list |> set_names(my_countries) |> bind_rows(.id = "Country")
+# 
 
-get_gdp <- function(country, key = my_key) {
-  country <- URLencode(country)
-  url <- glue("https://api.api-ninjas.com/v1/gdp?country={country};X-Api-Key={key}")
-  my_data <- safely(fromJSON)(url)
-  if (is.null(my_data$result)) {
-    return(NA)
-  } else {
-    return(my_data$result)
-  }
-}
-
-plastics <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2021/2021-01-26/plastics.csv')
-
-my_countries <- plastics |> distinct(country) |> pull(country)
-
-gdp_list <- my_countries |> map(get_gdp)
-
-gdp_df <- gdp_list |> set_names(my_countries) |> bind_rows(.id = "Country")
-
+write.csv(gdp_df,"gdp_data.csv")
+gdp_df <- read.csv("gdp_data.csv")
 # Align column name for merging
 names(gdp_df)[names(gdp_df) == "Country"] <- "country_merge"
 gdp_df <- gdp_df |> select(-country)
