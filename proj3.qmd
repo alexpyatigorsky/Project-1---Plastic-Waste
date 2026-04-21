@@ -14,12 +14,11 @@ Our second new dataset comes from a CSV downloaded from the U.S. Census Bureau's
 ```{r}
 #| message: false
 #| warning: false
-library(glue)
-library(jsonlite)
 library(tidyverse)
-library(httr)
-library(tidyjson)
+library(ggplot2)
 library(purrr)
+library(lubridate)
+library(dplyr)
 
 # get_gdp <- function(country, key = my_key) {
 #   country <- URLencode(country)
@@ -31,18 +30,12 @@ library(purrr)
 #     return(my_data$result)
 #   }
 # }
-# 
-# plastics <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2021/2021-01-26/plastics.csv')
-# 
-# my_countries <- plastics |> distinct(country) |> pull(country)
-# 
-# gdp_list <- my_countries |> map(get_gdp)
-# 
-# gdp_df <- gdp_list |> set_names(my_countries) |> bind_rows(.id = "Country")
-# 
 
-write.csv(gdp_df,"gdp_data.csv")
+plastics <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2021/2021-01-26/plastics.csv')
+
+# Load pre-saved GDP data (originally fetched from API Ninjas GDP API)
 gdp_df <- read.csv("gdp_data.csv")
+
 # Align column name for merging
 names(gdp_df)[names(gdp_df) == "Country"] <- "country_merge"
 gdp_df <- gdp_df |> select(-country)
@@ -145,7 +138,7 @@ plastics |>
     avg_population = mean(population, na.rm = TRUE)
   ) |>
   ggplot(aes(x = avg_population, y = total_plastic)) +
-  scale_x_continuous(labels = scales::comma, breaks = seq(0,1500000000, by=250000000)) +
+  scale_x_continuous(labels = scales::comma, breaks = seq(0, 1500000000, by = 250000000)) +
   geom_point(color = "dodgerblue", size = 1) +
   labs(
     title = "Plastic Waste vs. Population by Country",
