@@ -1,0 +1,401 @@
+---
+title: "Plastic Pollution Dashboard"
+format: 
+dashboard:
+orientation: rows
+theme: minty
+logo: "recycle-sign.png"
+nav-buttons:
+- icon: linkedin
+href: "https://www.linkedin.com/in/alexpyatigorsky/"
+aria-label: LinkedIn
+- icon: twitter
+href: "https://x.com/brady_oshea"
+aria-label: Twitter
+- icon: envelope
+href: "mailto:apyatigo@calpoly.edu"
+aria-label: Email
+execute:
+cache: false
+---
+
+```{r}
+#| include: false
+library(tidyverse)
+library(lubridate)
+library(ggridges)
+library(ggtext)
+library(scales)
+library(broom)
+library(knitr)
+library(patchwork)
+library(readr)
+```
+
+```{r}
+#| include: false
+
+plastics <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2021/2021-01-26/plastics.csv')
+
+gdp_df <- read.csv("gdp_data.csv")
+names(gdp_df)[names(gdp_df) == "Country"] <- "country_merge"
+gdp_df <- gdp_df |> select(-country)
+names(gdp_df)[names(gdp_df) == "country_merge"] <- "country"
+
+census_data <- read.csv("~/Downloads/IDB_04-15-2026.csv")
+census_data <- census_data[!is.na(census_data$Year),]
+census_data$Year <- as.numeric(census_data$Year)
+names(census_data) <- str_to_lower(names(census_data))
+names(census_data)[names(census_data) == 'name'] <- 'country'
+census_data$population <- as.numeric(gsub(",", "", census_data$population))
+census_data$area.in.square.kilometers <- as.numeric(gsub(",", "", census_data$area.in.square.kilometers))
+
+census_data <- census_data |>
+mutate(country = case_when(
+country == 'Côte d’Ivoire' ~ 'Cote D_ivoire',
+country == 'Korea, South' ~ 'Korea',
+country == 'Taiwan' ~ 'Taiwan_ Republic of China (ROC)',
+country == 'United States' ~ 'United States of America',
+TRUE ~ country
+))
+
+plastics <- plastics |>
+mutate(country = case_when(
+country == 'ECUADOR' ~ 'Ecuador',
+country == 'NIGERIA' ~ 'Nigeria',
+country == 'United Kingdom of Great Britain & Northern Ireland' ~ 'United Kingdom',
+TRUE ~ country
+))
+
+plastics <- merge(plastics, census_data, all.x = TRUE, by = c('country','year'))
+plastics <- merge(plastics, gdp_df, all.x = TRUE, by = c('country', 'year'))
+```
+
+# Overview
+
+## Row
+
+::: {.card title="Research Q1: Do wealthier countries produce more plastic waste per capita?"}
+
+Countries were grouped into Low, Middle, and High GDP per capita categories and compared by total plastic waste. The ridgeline plot (Overview page) shows that middle and high GDP countries tend to have a wider spread of plastic waste, with several high-GDP countries recording very large totals. However, low-GDP countries are not far behind. This suggests wealth alone does not cleanly predict plastic waste — high-GDP countries may generate more consumer plastic, but low-GDP countries may have less infrastructure to manage or reduce it.
+
+See the **Overview** and **Checkpoint 4** pages for supporting visuals.
+
+:::
+
+## Row
+
+::: {.card title="Research Q2: Is plastic waste driven more by population or economic output?"}
+
+The scatter plot (Checkpoint 3 page) shows a clear positive trend between population and total plastic waste — larger countries consistently generate more. GDP per capita adds nuance: wealthier countries tend to cluster above the trend line, suggesting economic output amplifies plastic waste beyond what population alone predicts. The linear model (Linear Model page) further supports this — country area was not a significant predictor (p = 0.738), pointing to population and economic activity together as the key drivers, not physical size.
+
+See the **Checkpoint 3** and **Linear Model** pages for supporting visuals.
+
+:::
+
+## Row {height="40%"}
+
+### Column
+
+::: {.card title="Findings"}
+The linear model regressed total plastic waste on plastic type and country area. The model explained little variation (R² = 0.034) but was statistically significant overall (F = 3.29, p = 0.002).
+
+Using HDPE as the reference, only the "other" category differed significantly with about 8,578 more units of waste on average. LDPE, PET, PP, PS, and PVC did not significantly differ from HDPE (all p \> 0.14).
+
+Country area was not significant (p = 0.738), suggesting plastic waste is driven more by population or economic activity than land area.
+:::
+
+# Notes
+
+::: {.card title="Excluded Countries"}
+Three countries were omitted from the per capita visual: Taiwan, Montenegro, and "EMPTY". Taiwan was removed for likely data collection issues since they recorded significantly more plastic pollution than multiple of the largest countries. Montenegro was removed for the same reason, an implausible amount of plastic pollution for their very small population. Cleanup events without a specified location could not be attributed to any country.
+:::
+
+```{r}
+#| include: false
+library(tidyverse)
+library(lubridate)
+library(ggridges)
+library(ggtext)
+library(scales)
+library(broom)
+library(knitr)
+library(patchwork)
+library(ggrepel)
+library(readr)
+
+plastics <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2021/2021-01-26/plastics.csv')
+
+gdp_df <- read.csv("gdp_data.csv")
+names(gdp_df)[names(gdp_df) == "Country"] <- "country_merge"
+gdp_df <- gdp_df |> select(-country)
+names(gdp_df)[names(gdp_df) == "country_merge"] <- "country"
+
+census_data <- read.csv("~/Downloads/IDB_04-15-2026.csv")
+census_data <- census_data[!is.na(census_data$Year),]
+census_data$Year <- as.numeric(census_data$Year)
+names(census_data) <- str_to_lower(names(census_data))
+names(census_data)[names(census_data) == 'name'] <- 'country'
+census_data$population <- as.numeric(gsub(",", "", census_data$population))
+census_data$area.in.square.kilometers <- as.numeric(gsub(",", "", census_data$area.in.square.kilometers))
+
+census_data <- census_data |>
+mutate(country = case_when(
+country == 'Côte d’Ivoire' ~ 'Cote D_ivoire',
+country == 'Korea, South' ~ 'Korea',
+country == 'Taiwan' ~ 'Taiwan_ Republic of China (ROC)',
+country == 'United States' ~ 'United States of America',
+TRUE ~ country
+))
+
+plastics <- plastics |>
+mutate(country = case_when(
+country == 'ECUADOR' ~ 'Ecuador',
+country == 'NIGERIA' ~ 'Nigeria',
+country == 'United Kingdom of Great Britain & Northern Ireland' ~ 'United Kingdom',
+TRUE ~ country
+))
+
+plastics <- merge(plastics, census_data, all.x = TRUE, by = c('country','year'))
+plastics <- merge(plastics, gdp_df, all.x = TRUE, by = c('country', 'year'))
+```
+
+# Checkpoint 1
+
+## Row
+
+::: {.card title="About the Data"}
+This dataset comes from Break Free From Plastic, a global movement holding corporations accountable for the plastic waste their products generate. Volunteers around the world helped collect and categorize plastic waste found in their communities by manufacturer and plastic type. The data covers 2019 and 2020 cycles, recording the parent company responsible for each piece of plastic, and the number of volunteers and collection events per country. The combined dataset contains one row per parent company per country per year, with plastic counts broken out by resin type alongside a grand total.
+:::
+
+## Row
+
+::: {.card title="Cleaning Done"}
+The raw data for each year were CSV files for 2019 and 2020, which were merged into one dataset. The 2019 files had duplicate polypropylene and polystyrene columns that were combined and removed, and the 2020 grand total column was a character column that needed to be converted to a number. Column names also differed between the two years and were standardized before combining.
+:::
+
+# Checkpoint 2
+
+## Row {height="40%"}
+
+::: panel-tabset
+### Volunteers per Cleanup
+
+```{r}
+plastics |> summarise(
+min = min(volunteers, na.rm = TRUE),
+mean = round(mean(volunteers, na.rm = TRUE), 1),
+median = median(volunteers, na.rm = TRUE),
+sd = round(sd(volunteers, na.rm = TRUE), 1),
+iqr = IQR(volunteers, na.rm = TRUE),
+max = max(volunteers, na.rm = TRUE)
+) |> kable()
+```
+
+### Cleanup Events
+
+```{r}
+plastics |> summarise(
+min = min(num_events, na.rm = TRUE),
+mean = round(mean(num_events, na.rm = TRUE), 1),
+median = median(num_events, na.rm = TRUE),
+sd = round(sd(num_events, na.rm = TRUE), 1),
+iqr = IQR(num_events, na.rm = TRUE),
+max = max(num_events, na.rm = TRUE)
+) |> kable()
+```
+:::
+
+## Row {height="60%"}
+
+```{r}
+#| title: "Proportion of Plastic Types"
+prop_summary <- function(df) {
+df |>
+pivot_longer(cols = c(hdpe, ldpe, o, pet, pp, ps, pvc),
+names_to = "plastic_type",
+values_to = "count") |>
+mutate(prop = count / grand_total) |>
+group_by(plastic_type) |>
+summarize(mean_prop = round(mean(prop, na.rm = TRUE), 4),
+total_count = sum(count, na.rm = TRUE))
+}
+
+prop_summary(plastics) |> kable()
+```
+
+# Checkpoint 3
+
+## Row
+
+::: panel-tabset
+### Top 20 Countries by Plastic Waste, Colored by GDP Per Capita
+
+```{r}
+#| fig-width: 10
+#| fig-height: 7
+
+plastics |>
+group_by(country) |>
+summarise(
+total_plastic = sum(grand_total, na.rm = TRUE),
+avg_gdp = mean(gdp_per_capita_nominal, na.rm = TRUE)
+) |>
+filter(!is.na(avg_gdp), total_plastic > 0) |>
+slice_max(total_plastic, n = 20) |>
+ggplot(aes(x = total_plastic, y = reorder(country, total_plastic), fill = avg_gdp)) +
+geom_col() +
+geom_text(aes(label = scales::comma(total_plastic)),
+hjust = -0.1, size = 3, color = "grey30") +
+scale_x_continuous(labels = scales::comma,
+expand = expansion(mult = c(0, 0.18))) +
+scale_fill_viridis_c(option = "plasma", labels = scales::dollar_format()) +
+labs(
+x = "Total Plastic Waste",
+y = NULL,
+fill = "GDP per Capita"
+) +
+theme_minimal(base_size = 12) +
+theme(panel.grid.major.y = element_blank(),
+legend.position = "right")
+```
+
+### Plastic Waste vs Population by Country (Log Scale)
+
+```{r}
+#| fig-width: 10
+#| fig-height: 6
+
+scatter_data <- plastics |>
+group_by(country) |>
+summarise(
+total_plastic = sum(grand_total, na.rm = TRUE),
+avg_population = mean(population, na.rm = TRUE)
+) |>
+filter(!is.na(avg_population), avg_population > 0, total_plastic > 0)
+
+notable <- scatter_data |>
+arrange(desc(total_plastic)) |>
+slice_head(n = 10) |>
+bind_rows(scatter_data |> arrange(desc(avg_population)) |> slice_head(n = 5)) |>
+distinct()
+
+ggplot(scatter_data, aes(x = avg_population, y = total_plastic)) +
+geom_smooth(method = "lm", se = FALSE, color = "grey60", linetype = "dashed") +
+geom_point(color = "dodgerblue", size = 2.5, alpha = 0.7) +
+ggrepel::geom_text_repel(data = notable, aes(label = country),
+size = 3.2, color = "grey20",
+min.segment.length = 0, max.overlaps = 20) +
+scale_x_log10(labels = scales::label_comma()) +
+scale_y_log10(labels = scales::label_comma()) +
+labs(
+x = "Population (log scale)",
+y = "Total Plastic Waste (log scale)"
+) +
+theme_minimal(base_size = 12)
+```
+:::
+
+# Checkpoint 4
+
+## Row {height="50%"}
+
+::: panel-tabset
+### Plastic Waste Distribution by GDP Group
+
+```{r}
+
+plastics |> 
+group_by(country) |> 
+summarize(total_plastic = sum(grand_total, na.rm = TRUE), 
+avg_gdp_per_capita = mean(gdp_per_capita_nominal, na.rm = TRUE)) |> 
+filter(!is.na(avg_gdp_per_capita)) |> 
+mutate(gdp_group = ifelse(avg_gdp_per_capita > 20000, "High GDP", 
+ifelse(avg_gdp_per_capita < 5000, "Low GDP", "Middle GDP")),
+gdp_group = factor(gdp_group, levels = c("Low GDP", "Middle GDP", "High GDP"))) |> 
+ggplot(aes(x = total_plastic, y = gdp_group, fill = gdp_group)) + 
+geom_density_ridges() +
+scale_x_log10(labels = scales::label_comma()) +
+scale_fill_manual(values = c("Low GDP" = "yellow", 
+"Middle GDP" = "orange", 
+"High GDP" = "red")) + 
+labs(subtitle = "Countries grouped by <span style='color: #d4a017;'>**Low**</span>, <span style='color: orange;'>**Middle**</span>, and <span style='color: red;'>**High**</span> GDP per Capita", 
+x = "Total Plastic Waste (Log Scale)", y = NULL) + 
+theme_minimal(base_size = 13) + 
+theme(legend.position = "none", 
+plot.subtitle = element_markdown())
+```
+
+### Top 10 Countries: Plastic Per Capita and GDP Per Capita
+
+```{r}
+#| fig-width: 10
+#| fig-height: 5
+
+plastics_percap <- plastics |> 
+filter(!str_detect(country, pattern = "Taiwan"),
+!str_detect(country, pattern = "EMPTY"),
+population > 5000000) |>
+group_by(country) |> 
+summarize(
+plastic_percap = sum(grand_total, na.rm = TRUE) / mean(population, na.rm = TRUE),
+gdp_ppp = mean(gdp_ppp, na.rm = TRUE)
+)
+
+top10 <- (plastics_percap |> arrange(desc(plastic_percap)))[1:10,]
+
+plastic_percap_lolipop <- top10 |>
+ggplot(aes(x = plastic_percap, y = country)) +
+geom_segment(aes(yend = country, x = 0, xend = plastic_percap), color = "gray50") +
+geom_point(size = 4, color = "steelblue") +
+labs(x = "Plastic Per Capita", y = "") +
+theme_minimal()
+
+gdp_percap_lolipop <- top10 |>
+ggplot(aes(x = gdp_ppp, y = country)) +
+geom_segment(aes(x = 0, xend = gdp_ppp), color = "grey25", linetype = "dotdash") +
+geom_point(size = 4, color = "tomato") +
+labs(x = "GDP PPP", y = "") +
+theme_minimal()
+
+plastic_percap_lolipop + gdp_percap_lolipop
+```
+:::
+
+# Linear Model
+
+## Row {height="50%"}
+
+```{r}
+#| title: "Coefficients: Total Plastic Waste by Type and Country Area"
+
+plastic_types <- c("hdpe", "ldpe", "o", "pet", "pp", "ps", "pvc")
+
+tot_plastic_types <- function(type) {
+plastics |>
+group_by(country) |>
+summarize(plastic_type = as.character(type),
+total = sum(get(type), na.rm = TRUE),
+area = mean(area.in.square.kilometers, na.rm = TRUE))
+}
+
+model_data <- map(plastic_types, tot_plastic_types) |> bind_rows()
+LinearModel <- lm(total ~ plastic_type + area, data = model_data)
+
+tidy(LinearModel) |>
+mutate(across(where(is.numeric), \(x) round(x, 3))) |>
+kable()
+```
+
+## Row {height="50%"}
+
+::: {.card title="Findings"}
+The linear model regressed total plastic waste on plastic type and country area. The model explained very little of the variation (R² = 0.034) but was statistically significant overall (F = 3.29, p = 0.002).
+
+Using HDPE as the reference category, only the "other" plastic category differed significantly from HDPE, with about 8,578 more units of waste on average. The remaining types (LDPE, PET, PP, PS, PVC) did not differ significantly from HDPE (all p \> 0.14).
+
+Country area was not a significant predictor of total plastic waste (p = 0.738), suggesting that the physical size of a country does not meaningfully explain how much plastic waste it generates. Plastic waste production is likely driven more by population or economic activity than by land area.
+:::
+
+::::::: {.card title="Excluded Countries"}
+Three countries were omitted from the per capita visual: Taiwan, Montenegro, and "EMPTY". Taiwan was removed for likely data collection issues since they recorded significantly more plastic pollution than multiple of the largest countries. Montenegro was removed for the same reason, an implausible amount of plastic pollution for their very small population. Cleanup events without a specified location could not be attributed to any country.
