@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.25">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Plastic Pollution Dashboard</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="dashboard_files/libs/clipboard/clipboard.min.js"></script>
+<script src="dashboard_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="dashboard_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="dashboard_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="dashboard_files/libs/quarto-html/popper.min.js"></script>
+<script src="dashboard_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="dashboard_files/libs/quarto-html/anchor.min.js"></script>
+<link href="dashboard_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="dashboard_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="dashboard_files/libs/quarto-html/quarto-syntax-highlighting-dark-707d8167ce6003fca903bfe2be84ab7f.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="dashboard_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="dashboard_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="dashboard_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="dashboard_files/libs/bootstrap/bootstrap-aa9b519f75efd10671d1764c05a1459f.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="dashboard_files/libs/bootstrap/bootstrap-dark-aa9b519f75efd10671d1764c05a1459f.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="light">
+<link href="dashboard_files/libs/bootstrap/bootstrap-aa9b519f75efd10671d1764c05a1459f.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script src="dashboard_files/libs/quarto-dashboard/quarto-dashboard.js"></script>
+<script src="dashboard_files/libs/quarto-dashboard/stickythead.js"></script>
+
+
+
+<script src="dashboard_files/libs/quarto-dashboard/web-components.js" type="module"></script>
+<script src="dashboard_files/libs/quarto-dashboard/components.js"></script>
+
+<link href="dashboard_files/libs/htmltools-fill-0.5.9/fill.css" rel="stylesheet">
+<script src="dashboard_files/libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="dashboard_files/libs/plotly-binding-4.12.0/plotly.js"></script>
+<script src="dashboard_files/libs/typedarray-0.1/typedarray.min.js"></script>
+<script src="dashboard_files/libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<link href="dashboard_files/libs/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet">
+<script src="dashboard_files/libs/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+<link href="dashboard_files/libs/plotly-htmlwidgets-css-2.25.2/plotly-htmlwidgets.css" rel="stylesheet">
+<script src="dashboard_files/libs/plotly-main-2.25.2/plotly-latest.min.js"></script>
+<link href="dashboard_files/libs/leaflet-1.3.1/leaflet.css" rel="stylesheet">
+<script src="dashboard_files/libs/leaflet-1.3.1/leaflet.js"></script>
+<link href="dashboard_files/libs/leafletfix-1.0.0/leafletfix.css" rel="stylesheet">
+<script src="dashboard_files/libs/proj4-2.6.2/proj4.min.js"></script>
+<script src="dashboard_files/libs/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
+<link href="dashboard_files/libs/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet">
+<script src="dashboard_files/libs/leaflet-binding-2.2.3/leaflet.js"></script>
+<script src="dashboard_files/libs/leaflet-providers-3.0.0/leaflet-providers.js"></script>
+<script src="dashboard_files/libs/leaflet-providers-plugin-2.2.3/leaflet-providers-plugin.js"></script>
+
+
+</head>
+
+<body class="quarto-dashboard dashboard-fill fullcontent quarto-light">
+
+<header id="quarto-dashboard-header">
+<nav class="navbar navbar-expand-md slim" data-bs-theme="dark">
+  <div class="navbar-container container-fluid">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#dashboard-collapse" aria-controls="dashboard-collapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>    
+
+
+    <div class="navbar-brand-container">
+    <a href="#"><img src="recycle-sign.png" alt="" class="navbar-logo light-content d-inline-block"></a>
+    <a href="#"><img src="recycle-sign.png" alt="" class="navbar-logo dark-content d-inline-block"></a>
+      <div class="navbar-title">
+        <div class="navbar-title-text"><a href="#">Plastic Pollution Dashboard</a></div>
+        
+        
+      </div>
+    </div>
+<div id="dashboard-collapse" class="navbar-collapse collapse"><ul class="navbar-nav navbar-nav-scroll me-auto" role="tablist"><li class="nav-item" role="presentation"><a id="tab-overview" class="nav-link active" data-bs-toggle="tab" role="tab" data-bs-target="#overview" data-scrolling="false" href="#overview" aria-controls="overview" aria-selected="true"><span class="nav-link-text">Overview</span></a></li><li class="nav-item" role="presentation"><a id="tab-switzerland-further-investigation" class="nav-link" data-bs-toggle="tab" role="tab" data-bs-target="#switzerland-further-investigation" data-scrolling="false" href="#switzerland-further-investigation" aria-controls="switzerland-further-investigation" aria-selected="false"><span class="nav-link-text">Switzerland Further Investigation</span></a></li></ul><div class="quarto-dashboard-links"><a class="quarto-dashboard-link" href="https://www.linkedin.com/in/alexpyatigorsky/" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a><a class="quarto-dashboard-link" href="mailto:apyatigo@calpoly.edu" aria-label="Email"><i class="bi bi-envelope"></i></a></div></div></div>
+</nav>
+</header>
+<div class="page-layout-custom quarto-dashboard-content bslib-gap-spacing html-fill-container bslib-page-fill quarto-dashboard-pages">  
+
+<div class="bslib-grid-item html-fill-item tab-content bslib-grid" data-layout="fill" style="display: grid; grid-template-columns: minmax(3em, 1fr);
+grid-auto-rows: minmax(0, 1fr);">
+<div id="overview" class="dashboard-page tab-pane show active html-fill-item html-fill-container" data-orientation="columns" aria-labelledby="tab-overview">
+<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-columns: minmax(3em, 35fr) minmax(3em, 65fr);
+grid-auto-rows: minmax(0, 1fr);">
+<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
+<div class="card html-fill-item html-fill-container bslib-card" data-title="Research Question: Do wealthier countries produce more plastic pollution per capita?" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
+<div class="card-header"><div class="card-title"><span style="display: inline">
+Research Question: Do wealthier countries produce more plastic pollution per capita?
+</span></div></div>
+<div class="card-body html-fill-item html-fill-container">
+<p>When we directly compare GDP per capita to total plastic waste (per Fig. 1), we see a fairly uniform spread, suggesting that countries across the spectrum of wealth typically create a similar amount of pollution. There are angles to look at the cause of this, the most succinct being that countries with more wealth consume more on average, but also have better waste management systems. Poorer countries consume less on average but tend to have worse waste management systems.</p>
+<p>However, we do see one heavy outlier, Switzerland, who has both a very high GDP per capita and easily the highest plastic waste per capita.</p>
+</div>
+<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
+    <template>Expand</template>
+    <span class="bslib-full-screen-enter badge rounded-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
+    </span>
+</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
+</div><div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, max-content); grid-auto-columns: minmax(0, 1fr);">
+<div class="card html-fill-item html-fill-container bslib-card" data-fill="false" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
+<div class="card-body html-fill-item html-fill-container">
+<div class="panel-tabset html-fill-item html-fill-container">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">GDP Per Capita vs.&nbsp;Plastic Waste Per Capita</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">Excluded Countries</a></li></ul>
+<div class="tab-content html-fill-item html-fill-container">
+<div id="tabset-1-1" class="tab-pane active html-fill-item html-fill-container" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div class="card cell html-fill-item html-fill-container bslib-card" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
+<div class="card-body html-fill-item html-fill-container">
+<div class="cell-output-display html-fill-item html-fill-container">
+<div class="plotly html-widget html-fill-item html-fill-container" id="htmlwidget-6b1a84672e5cb6d66f22" style="width:100%;height:454px;"></div>
+<script type="application/json" data-for="htmlwidget-6b1a84672e5cb6d66f22">{"x":{"data":[{"x":[4.361328699528995,4.7314471151505133,3.8204826015981679,3.5194965045445032,4.2051861082837485,4.409419342036963,3.3585887758090647,3.6212200207152239,4.6934315045068802,4.4020312400100021,4.2432624285337219,4.1943499520759966,null,4.7977884440311014,4.0917409015593034,3.9687667816390295,4.7109519702706146,4.7698135083591904,3.7952647736422782,4.4629074857753563,3.7388529876918932,4.7861751598353344,3.8492020327303296,4.0842100852368564,4.9891353565179548,4.6661550513083343,4.6315624672776377,3.7045634831142231,null,4.4614858581370624,4.310750377908235,4.7964724359688464,3.7461832853701953,4.1127560735443582,3.9593560247505066,4.5700740660687345,4.5337940012642592,3.3823710014709532,4.3024672142802842,5.0069453842068512,4.1263462430990474,4.6364071028126386,4.1456719141888536,4.8681652231141612,3.47200677452255,4.3064764554302561,3.3832011768733929,4.089578809016353,4.451236390233392,4.1734345449203731,4.868403955450578,4.6832048682332843,4.8137821067456077,4.0491054641764777],"y":[14.335629530322723,6.5444375189782651,1.4592878725565697,81.58412362517052,5.4905892491683002,7.0875347501688655,99.892816413353927,63.440096237039064,5.0204239208041992,10.942836516713742,0.65630791796019561,16.386214148932165,0.38623631584773516,82.11086422840971,148.43559976508806,14.629270435103127,4.4559306554811808,6.8382826821161729,31.793610961204269,0.36775657456816185,0.021977391637448641,102.55535133297757,1.5469369794528309,13.556371816481438,5.5464837082478002,2.749119289542806,0.34489488481580677,56.260302535934464,3.2054445140060386,48.968795123696736,2.9049309494469306,61.843980683509521,104.98309044092936,2.008330177012339,120.39920575114562,101.05317096523966,0.46876478057489318,6.567105321740458,7.7297109671472697,1.6350316722845779,4.6424639967460477,10.640546090696173,36.518417703126573,787.66406138643765,16.936312774083049,4.947466085551385,148.34185859956085,20.615843099254715,0.43612429277729414,40.260857841167173,0.25672200249528648,6.9101906101985611,6.8394805300256678,30.328105152468417],"text":["Argentina <br>Population: 44797475","Australia <br>Population: 25578974","Bangladesh <br>Population: 165491679","Benin <br>Population: 12647068","Brazil <br>Population: 213547207","Bulgaria <br>Population: 6998202","Burkina Faso <br>Population: 20431900","Cameroon <br>Population: 27096428","Canada <br>Population: 37626305","Chile <br>Population: 18578364","China <br>Population: 1409399422","Colombia <br>Population: 48376031","Cote D_ivoire <br>Population: 27444338","Denmark <br>Population: 5837230","Ecuador <br>Population: 17315927","El Salvador <br>Population: 6288762","France <br>Population: 67774843","Germany <br>Population: 84494898","Ghana <br>Population: 31260998","Greece <br>Population: 10604841","Honduras <br>Population: 9100261","Hong Kong <br>Population: 7231217","India <br>Population: 1364308972","Indonesia <br>Population: 271267272","Ireland <br>Population: 5030214","Italy <br>Population: 61437858","Japan <br>Population: 125545498","Kenya <br>Population: 49491380","Korea <br>Population: 51880480","Malaysia <br>Population: 33080250","Mexico <br>Population: 127438485","Netherlands <br>Population: 17312922","Nigeria <br>Population: 213742041","Peru <br>Population: 31867270","Philippines <br>Population: 107322967","Portugal <br>Population: 10305466","Romania <br>Population: 18986068","Rwanda <br>Population: 12577840","Serbia <br>Population: 6856660","Singapore <br>Population: 5810285","South Africa <br>Population: 57447941","Spain <br>Population: 46849099","Sri Lanka <br>Population: 21260505","Switzerland <br>Population: 8541586","Tanzania <br>Population: 58123631","Thailand <br>Population: 69146507","Togo <br>Population: 8085378","Tunisia <br>Population: 11636682","Turkey <br>Population: 81628106","Ukraine <br>Population: 43630466","United Arab Emirates <br>Population: 9738160","United Kingdom <br>Population: 66973551","United States of America <br>Population: 330756114","Vietnam <br>Population: 100840458"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(137,192,174,1)","opacity":0.69999999999999996,"size":9.4488188976377963,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(137,192,174,1)"}},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":23.305936073059364,"r":7.3059360730593621,"b":80,"l":43.105022831050235},"plot_bgcolor":"rgba(235,235,235,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[3.2761709453891754,5.0893632146267409],"tickmode":"array","ticktext":["3,000","10,000","30,000","100,000"],"tickvals":[3.4771212547196626,4,4.4771212547196626,5],"categoryorder":"array","categoryarray":["3,000","10,000","30,000","100,000"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y","title":{"text":"GDP PPP (log scale)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-39.360126808102564,827.04616558617772],"tickmode":"array","ticktext":["0","200","400","600","800"],"tickvals":[0,200.00000000000003,400,600,800],"categoryorder":"array","categoryarray":["0","200","400","600","800"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":{"text":"Plastic Per 100,000 People","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[],"showlegend":false,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.8897637795275593,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498}},"hovermode":"closest","barmode":"relative","annotations":[{"text":"Fig. 1: GDP Per Capita vs. Plastic Waste Per Capita","x":0,"y":-0.17999999999999999,"xref":"paper","yref":"paper","showarrow":false,"font":{"size":11,"color":"gray40"},"xanchor":"left"}]},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false,"displayModeBar":false},"source":"A","attrs":{"178096dd1990c":{"x":{},"y":{},"text":{},"type":"scatter"}},"cur_data":"178096dd1990c","visdat":{"178096dd1990c":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
+    <template>Expand</template>
+    <span class="bslib-full-screen-enter badge rounded-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
+    </span>
+</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
+</div>
+<div id="tabset-1-2" class="tab-pane html-fill-item html-fill-container" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<p>Three countries were omitted from the per capita visual: Taiwan, Montenegro, and “EMPTY”. Taiwan was removed for likely data collection issues since they recorded significantly more plastic pollution than multiple of the largest countries. Montenegro was removed for the same reason, an implausible amount of plastic pollution for their very small population. Cleanup events without a specified location could not be attributed to any country thus we removed “EMPTY”.</p>
+</div>
+</div>
+</div>
+</div>
+<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
+    <template>Expand</template>
+    <span class="bslib-full-screen-enter badge rounded-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
+    </span>
+</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
+</div>
+</div>
+</div><div id="switzerland-further-investigation" class="dashboard-page tab-pane grid-skip html-fill-item html-fill-container" data-orientation="columns" aria-labelledby="tab-switzerland-further-investigation">
+<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-columns: minmax(3em, 35fr) minmax(3em, 65fr);
+grid-auto-rows: minmax(0, 1fr);">
+<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr) minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
+<div class="card html-fill-item html-fill-container bslib-card" data-title="Why this country?" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
+<div class="card-header"><div class="card-title"><span style="display: inline">
+Why this country?
+</span></div></div>
+<div class="card-body html-fill-item html-fill-container">
+<p>Switzerland is a clear outlier in the visual, with the highest plastic waste per capita, enough though they have the GDP. We would expected wealthy countries to manage waste better, so we wanted to investigate whether their disposal infrastructure explains the gap. As we can see in this case, we found otherwise.</p>
+</div>
+<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
+    <template>Expand</template>
+    <span class="bslib-full-screen-enter badge rounded-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
+    </span>
+</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
+<div class="card html-fill-item html-fill-container bslib-card" data-title="Findings" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
+<div class="card-header"><div class="card-title"><span style="display: inline">
+Findings
+</span></div></div>
+<div class="card-body html-fill-item html-fill-container">
+<p>Switzerland operates about 30 government waste incineration plants, as well as bans landfilling of combustible waste, so nearly all plastic is burned rather than recycled. We see high consumption directly in cleanup data instead of being recycled, which helps explain why their per capita number is so high.</p>
+</div>
+<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
+    <template>Expand</template>
+    <span class="bslib-full-screen-enter badge rounded-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
+    </span>
+</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
+</div><div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
+<div class="card html-fill-item html-fill-container bslib-card" data-title="Switzerland Government Waste Incineration Facilities" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
+<div class="card-header"><div class="card-title"><span style="display: inline">
+Switzerland Government Waste Incineration Facilities
+</span></div></div>
+<div class="card-body html-fill-item html-fill-container">
+<p>Each marker represents a waste incineration facility, with size proportional to total waste processed between 2010 and 2024.</p>
+</div>
+<div class="cell card-body html-fill-item html-fill-container">
+<div class="cell-output-display html-fill-item html-fill-container">
+<div class="leaflet html-widget html-fill-item html-fill-container" id="htmlwidget-f115c3ac52dffb4ed6ad" style="width:100%;height:406px;"></div>
+<script type="application/json" data-for="htmlwidget-f115c3ac52dffb4ed6ad">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addProviderTiles","args":["CartoDB.Positron",null,null,{"errorTileUrl":"","noWrap":false,"detectRetina":false}]},{"method":"addCircleMarkers","args":[[47.38866047782307,47.30266280658746,47.4857154033135,46.95169165390491,47.12098991065077,46.76160072581949,47.57298898858817,46.77318640149955,46.19477082802239,47.1360238632863,46.91621265476044,47.11333727085288,46.97204597750702,47.10781269422515,47.42311794926523,47.17578165696019,47.4150510106852,47.21496450475118,47.55694558274995,46.17237536497046,46.53385921365597,46.30194623516174,46.24121874423805,46.27810741480599,47.41658794398492,47.30773573585543,47.2486304176434,47.41422452211816,47.38671369496372,47.4975287018979],[8.102835895088427,7.923916063973841,8.269244455643653,7.414290902589227,7.257829472595079,7.606357060264212,7.569528608518319,7.120481158327437,6.031142997347133,9.04030906534944,9.556384670347523,8.37528988870795,6.848584280841892,6.834964357399644,9.067835339837078,9.483528913524225,9.331541163261614,7.570571840333213,9.129004555508185,8.990176613765344,6.645157212348744,7.940773158760729,7.418147564872953,6.961229341476098,8.403070845903359,8.820152622277867,8.609162461927193,8.564962666725421,8.522090235885454,8.751750072185772],[9.275822814655792,6.95574902109359,9.000496282613161,9.295028539792417,5.654646074001645,9.863307986899956,12.28068402003732,7.896801040083679,12.34672966146636,8.651317176528028,8.472150455069441,10.68240089534599,6.426566389259163,5.974259600802243,7.569641118749731,11.07481627637929,7.137466092544484,12.50972954677012,9.903247503274423,10.90591888227061,10.78027622816575,5.100605628528614,6.571081426303521,10.54643067582583,7.787357275310625,11.19265036629941,5.618691029847512,12.81421779812478,7.979153394244836,10.83799079370547],null,null,{"interactive":true,"className":"","stroke":true,"color":"#89C0AE","weight":1,"opacity":0.5,"fill":true,"fillColor":"#89C0AE","fillOpacity":0.7},null,null,["<b>Buchs (AG) GEKAL<\/b><br>Location: Buchs<br>Operating since: 1969<br>Total waste processed: 1,935,920 tonnes","<b>Oftringen ERZO<\/b><br>Location: Oftringen<br>Operating since: 1974<br>Total waste processed: 1,088,605 tonnes","<b>Turgi<\/b><br>Location: Turgi<br>Operating since: 1970<br>Total waste processed: 1,822,701 tonnes","<b>Bern Energiezentrale Forsthaus EWB<\/b><br>Location: Bern<br>Operating since: 2012<br>Total waste processed: 1,943,945 tonnes","<b>Biel MÜVE<\/b><br>Location: Biel-Bienne<br>Operating since: 1967<br>Total waste processed:   719,438 tonnes","<b>Thun AVAG<\/b><br>Location: Thun<br>Operating since: 2003<br>Total waste processed: 2,188,909 tonnes","<b>Basel IWB<\/b><br>Location: Basel<br>Operating since: 1943<br>Total waste processed: 3,393,342 tonnes","<b>Posieux SAIDEF<\/b><br>Location: Posieux<br>Operating since: 2001<br>Total waste processed: 1,403,088 tonnes","<b>Les Cheneviers SIG<\/b><br>Location: Genf<br>Operating since: 1966<br>Total waste processed: 3,429,939 tonnes","<b>Niederurnen Linthgebiet<\/b><br>Location: Niederurnen<br>Operating since: 1973<br>Total waste processed: 1,684,019 tonnes","<b>Trimmis GEVAG<\/b><br>Location: Untervaz-Bahnhof<br>Operating since: 1975<br>Total waste processed: 1,614,990 tonnes","<b>Perlen Renergia<\/b><br>Location: Perlen<br>Operating since: 2015<br>Total waste processed: 2,567,558 tonnes","<b>Colombier VADEC<\/b><br>Location: Colombier<br>Operating since: 1971<br>Total waste processed:   929,267 tonnes","<b>La Chaux-de-Fonds VADEC<\/b><br>Location: La Chaux-de-Fonds<br>Operating since: 1972<br>Total waste processed:   803,065 tonnes","<b>Bazenheid ZAB<\/b><br>Location: Bazenheid<br>Operating since: 1976<br>Total waste processed: 1,289,238 tonnes","<b>Buchs (SG) VfA<\/b><br>Location: Buchs (SG)<br>Operating since: 1960<br>Total waste processed: 2,759,660 tonnes","<b>St. Gallen<\/b><br>Location: St. Gallen<br>Operating since: 1972<br>Total waste processed: 1,146,227 tonnes","<b>Zuchwil Emmenspitz KEBAG<\/b><br>Location: Zuchwil<br>Operating since: 1976<br>Total waste processed: 3,521,100 tonnes","<b>Weinfelden KVA Thurgau<\/b><br>Location: Weinfelden<br>Operating since: 1996<br>Total waste processed: 2,206,672 tonnes","<b>Giubiasco ACR<\/b><br>Location: Giubiasco<br>Operating since: 2009<br>Total waste processed: 2,676,129 tonnes","<b>Lausanne TRIDEL<\/b><br>Location: Lausanne<br>Operating since: 2006<br>Total waste processed: 2,614,823 tonnes","<b>Gamsen KVA Oberwallis<\/b><br>Location: Gamsen<br>Operating since: 1971<br>Total waste processed:   585,364 tonnes","<b>Sion UTO<\/b><br>Location: Uvrier<br>Operating since: 1971<br>Total waste processed:   971,530 tonnes","<b>Monthey SATOM<\/b><br>Location: Monthey<br>Operating since: 1976<br>Total waste processed: 2,502,612 tonnes","<b>Dietikon Limeco<\/b><br>Location: Dietikon<br>Operating since: 1971<br>Total waste processed: 1,364,466 tonnes","<b>Hinwil KEZO<\/b><br>Location: Hinwil<br>Operating since: 1963<br>Total waste processed: 2,818,697 tonnes","<b>Horgen<\/b><br>Location: Horgen<br>Operating since: 1967<br>Total waste processed:   710,318 tonnes","<b>Zürich Hagenholz ERZ<\/b><br>Location: Zürich<br>Operating since: 1969<br>Total waste processed: 3,694,594 tonnes","<b>Zürich Josefstrasse ERZ<\/b><br>Location: Zürich<br>Operating since: 1904<br>Total waste processed: 1,432,505 tonnes","<b>Winterthur Stadtwerk<\/b><br>Location: Winterthur<br>Operating since: 1965<br>Total waste processed: 2,642,896 tonnes"],null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"limits":{"lat":[46.17237536497046,47.57298898858817],"lng":[6.031142997347133,9.556384670347523]},"setView":[[46.8,8.199999999999999],8,[]]},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div class="card-body html-fill-item html-fill-container">
+<p>Data on waste incineration plants from <a href="https://www.geocat.ch/geonetwork/srv/eng/catalog.search#/metadata/d9596eaf-5629-4756-9a46-4f178407b905">geocat.ch</a>.</p>
+</div>
+<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
+    <template>Expand</template>
+    <span class="bslib-full-screen-enter badge rounded-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
+    </span>
+</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
+<div id="3ade8a4a-fb1d-4a6c-8409-ac45482d5fc9" class="hidden html-fill-item html-fill-container">
+
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /container fluid -->
+
+<script type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (_event) {
+  if (window.bslib.Card) {
+    window.bslib.Card.initializeAllCards();
+  }
+}); 
+</script>
+  
+
+
+
+</body></html>

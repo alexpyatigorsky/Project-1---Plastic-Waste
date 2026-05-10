@@ -1,0 +1,197 @@
+---
+title: "Plastic Pollution Dashboard"
+format:
+  dashboard:
+    orientation: columns
+    theme: minty
+    logo: "recycle-sign.png"
+    nav-buttons:
+      - icon: linkedin
+        href: "https://www.linkedin.com/in/alexpyatigorsky/"
+        aria-label: LinkedIn
+      - icon: envelope
+        href: "mailto:apyatigo@calpoly.edu"
+        aria-label: Email
+execute:
+  cache: false
+---
+
+```{r}
+#| include: false
+library(tidyverse)
+library(lubridate)
+library(ggridges)
+library(ggtext)
+library(scales)
+library(broom)
+library(knitr)
+library(patchwork)
+library(readr)
+library(ggrepel)
+library(plotly)
+library(leaflet)
+library(sf)
+```
+
+```{r}
+#| include: false
+
+plastics <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2021/2021-01-26/plastics.csv')
+
+gdp_df <- read.csv("gdp_data.csv")
+names(gdp_df)[names(gdp_df) == "Country"] <- "country_merge"
+gdp_df <- gdp_df |> select(-country)
+names(gdp_df)[names(gdp_df) == "country_merge"] <- "country"
+
+census_data <- read.csv("IDB_04-15-2026.csv")
+census_data <- census_data[!is.na(census_data$Year),]
+census_data$Year <- as.numeric(census_data$Year)
+names(census_data) <- str_to_lower(names(census_data))
+names(census_data)[names(census_data) == 'name'] <- 'country'
+census_data$population <- as.numeric(gsub(",", "", census_data$population))
+census_data$area.in.square.kilometers <- as.numeric(gsub(",", "", census_data$area.in.square.kilometers))
+
+census_data <- census_data |>
+  mutate(country = case_when(
+    country == 'Côte d’Ivoire' ~ 'Cote D_ivoire',
+    country == 'Korea, South' ~ 'Korea',
+    country == 'Taiwan' ~ 'Taiwan_ Republic of China (ROC)',
+    country == 'United States' ~ 'United States of America',
+    TRUE ~ country
+  ))
+
+plastics <- plastics |>
+  mutate(country = case_when(
+    country == 'ECUADOR' ~ 'Ecuador',
+    country == 'NIGERIA' ~ 'Nigeria',
+    country == 'United Kingdom of Great Britain & Northern Ireland' ~ 'United Kingdom',
+    TRUE ~ country
+  ))
+
+plastics <- merge(plastics, census_data, all.x = TRUE, by = c('country','year'))
+plastics <- merge(plastics, gdp_df, all.x = TRUE, by = c('country', 'year'))
+```
+
+# Overview
+
+## Column {width="35%"}
+
+::: {.card title="Research Question: Do wealthier countries produce more plastic pollution per capita?"}
+
+When we directly compare GDP per capita to total plastic waste (per Fig. 1), we 
+see a fairly uniform spread, suggesting that countries across the spectrum of wealth
+typically create a similar amount of pollution. There are angles to look at the
+cause of this, the most succinct being that countries with more wealth consume
+more on average, but also have better waste management systems. Poorer countries
+consume less on average but tend to have worse waste management systems. 
+
+However, we do see one heavy outlier, Switzerland, who has both a very high
+GDP per capita and easily the highest plastic waste per capita.
+:::
+
+## Column {width="65%"}
+
+::: panel-tabset
+
+### GDP Per Capita vs. Plastic Waste Per Capita
+
+```{r}
+#| fig-width: 10
+#| fig-height: 7
+
+plastics_percap = plastics |> 
+filter(!str_detect(country, pattern = "Taiwan"),
+!str_detect(country, pattern = "EMPTY"),
+population > 5000000) |>
+group_by(country) |> 
+summarize(
+plastic_pc = sum(grand_total, na.rm = TRUE) / mean(population, na.rm = TRUE),
+mean_gdp_percap = mean(gdp_per_capita_ppp, na.rm = TRUE),
+mean_pop = mean(population)
+)
+
+
+
+p <- ggplot(plastics_percap, aes(x = mean_gdp_percap, y = plastic_pc*100000,text = paste(country, 
+                                               "<br>Population:", round(mean_pop,0)))) +
+  geom_point(color = "#89C0AE", size = 2.5, alpha = 0.7) +
+  scale_x_log10(labels = scales::comma) +
+  labs(x = "GDP PPP (log scale)", y = "Plastic Per 100,000 People")
+
+
+ggplotly(p, tooltip = "text") |>
+  config(displayModeBar = FALSE) |>
+  layout(
+    margin = list(b = 80),
+    annotations = list(
+      list(
+        text = "Fig. 1: GDP Per Capita vs. Plastic Waste Per Capita",
+        x = 0, y = -0.18,
+        xref = "paper", yref = "paper",
+        showarrow = FALSE,
+        font = list(size = 11, color = "gray40"),
+        xanchor = "left"
+      )
+    )
+  )
+
+```
+
+### Excluded Countries
+
+Three countries were omitted from the per capita visual: Taiwan, Montenegro, and "EMPTY". Taiwan was removed for likely data collection issues since they recorded significantly more plastic pollution than multiple of the largest countries. Montenegro was removed for the same reason, an implausible amount of plastic pollution for their very small population. Cleanup events without a specified location could not be attributed to any country thus we removed "EMPTY".
+:::
+
+# Switzerland Further Investigation
+
+## Column {width="35%"}
+
+::: {.card title="Why this country?"}
+Switzerland is a clear outlier in the visual, with the highest plastic waste per capita, enough though they have the GDP. We would expected wealthy countries to manage waste better, so we wanted to investigate whether their disposal infrastructure explains the gap. As we can see in this case, we found otherwise.
+:::
+
+::: {.card title="Findings"}
+Switzerland operates about 30 government waste incineration plants, as well as bans landfilling of combustible waste, so nearly all plastic is burned rather than recycled. We see high consumption directly in cleanup data instead of being recycled, which helps explain why their per capita number is so high.
+:::
+
+## Column {width="65%"}
+
+::: {.card title="Switzerland Government Waste Incineration Facilities"}
+
+Each marker represents a waste incineration facility, with size proportional to total waste processed between 2010 and 2024.
+
+```{r}
+plants <- read.csv("~/Downloads/WasteIncinerationPlant.csv")
+recycled <- read.csv("~/Downloads/RecycledWaste.csv")
+
+recycled$total <- rowSums(recycled[, 3:ncol(recycled)], na.rm = TRUE)
+plants <- merge(plants, recycled[, c("id", "total")], by.x = "xtf_id", by.y = "id")
+
+plants_sf <- st_as_sf(plants, coords = c("x", "y"), crs = 2056)
+plants_wgs84 <- st_transform(plants_sf, crs = 4326)
+coords <- st_coordinates(plants_wgs84)
+plants$lng <- coords[, 1]
+plants$lat <- coords[, 2]
+
+leaflet(plants) |>
+  addProviderTiles(providers$CartoDB.Positron) |>
+  addCircleMarkers(
+    lng = ~lng, lat = ~lat,
+    radius = ~sqrt(total) / 150,
+    color = "#89C0AE",
+    fillColor = "#89C0AE",
+    fillOpacity = 0.7,
+    stroke = TRUE,
+    weight = 1,
+    popup = ~paste0(
+      "<b>", Name, "</b><br>",
+      "Location: ", Place, "<br>",
+      "Operating since: ", BeginningOfOperation, "<br>",
+      "Total waste processed: ", format(total, big.mark = ","), " tonnes"
+    )
+  ) |>
+  setView(lng = 8.2, lat = 46.8, zoom = 8)
+```
+
+Data on waste incineration plants from [geocat.ch](https://www.geocat.ch/geonetwork/srv/eng/catalog.search#/metadata/d9596eaf-5629-4756-9a46-4f178407b905).
+:::
